@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000 ;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { query } = require('express');
 
 
 const app = express();
@@ -19,6 +20,7 @@ async function run(){
         await client.connect();
         const partsCollection = client.db('moto_parts').collection('parts');
         const orderCollection = client.db('moto_parts').collection('order');
+        const userCollection = client.db('moto_parts').collection('users');
         app.get('/part',async(req,res)=>{
             const query = {};
             const cursor = partsCollection.find(query);
@@ -30,6 +32,18 @@ async function run(){
             const query = {_id: ObjectId(id)};
             const part = await partsCollection.findOne(query);
             res.send(part);
+        })
+        app.put('/user/:email',async(req,res)=>{
+            const email = req.params.email;
+            const filter = {email: email};
+            const user = req.body;
+            const options = {upsert: true};
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter,updateDoc,options);
+            res.send(result);
+
         })
 
         app.get('/order',async(req,res)=>{
@@ -51,6 +65,15 @@ async function run(){
             const result = await orderCollection.insertOne(order);
             res.send(result);
         })
+        // app.get('/user',async(req,res)=>{
+        //     const users= await userCollection.find().toArray();
+        //     res.send(users);
+        // })
+        // app.get("/user/:email", async (req, res) => {
+        //     const email = req.params.email;
+        //     const user = await userCollection.findOne({ email: email });
+        //     res.send(user);
+        //   });
 
 
     }
