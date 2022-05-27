@@ -21,6 +21,7 @@ async function run(){
         const partsCollection = client.db('moto_parts').collection('parts');
         const orderCollection = client.db('moto_parts').collection('order');
         const userCollection = client.db('moto_parts').collection('users');
+        const reviewCollection = client.db('moto_parts').collection('reviews');
         app.get('/part',async(req,res)=>{
             const query = {};
             const cursor = partsCollection.find(query);
@@ -67,18 +68,22 @@ async function run(){
         app.post('/order',async(req,res)=>{
             const order = req.body;
             const query = {price: order.price}
-            const result = await orderCollection.insertOne(order);
+            const result = await orderCollection.insertOne(query);
             res.send(result);
         })
-        // app.get('/user',async(req,res)=>{
-        //     const users= await userCollection.find().toArray();
-        //     res.send(users);
-        // })
-        // app.get("/user/:email", async (req, res) => {
-        //     const email = req.params.email;
-        //     const user = await userCollection.findOne({ email: email });
-        //     res.send(user);
-        //   });
+        app.get('/review',async(req,res)=>{
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        })
+        app.post('/review',async(req,res)=>{
+            const review = req.body;
+            const query = {name : review.name , review :review.star ,rating : review.rating ,img : review.img}
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+        
 
 
     }
