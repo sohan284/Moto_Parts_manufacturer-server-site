@@ -3,7 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000 ;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { query } = require('express');
+const query = require('express/lib/middleware/query');
+const { ObjectID } = require('bson');
 
 
 const app = express();
@@ -34,6 +35,10 @@ async function run(){
             const part = await partsCollection.findOne(query);
             res.send(part);
         })
+        app.get('/user',async(req,res)=>{
+            const users = await userCollection.find().toArray();
+            res.send(users)
+        })
         app.put('/user/:email',async(req,res)=>{
             const email = req.params.email;
             const filter = {email: email};
@@ -53,17 +58,14 @@ async function run(){
             const order = await cursor.toArray();
             res.send(order);
         })
-        app.get("/order/:email",async (req,res)=>{
-            const email = req.params.user;
-            const result = await orderCollection.findOne(email);
-            res.send(result);
-        });
+        
         app.get('/order/:id', async(req, res) =>{
             const id = req.params.id;
             const query = {_id: ObjectId(id)};
             const order = await orderCollection.findOne(query);
             res.send(order);
           })
+
         
         app.post('/order',async(req,res)=>{
             const order = req.body;
@@ -77,6 +79,7 @@ async function run(){
             const reviews = await cursor.toArray();
             res.send(reviews);
         })
+       
         app.post('/review',async(req,res)=>{
             const review = req.body;
             const query = {name : review.name , review :review.star ,rating : review.rating ,img : review.img}
@@ -84,7 +87,7 @@ async function run(){
             res.send(result);
         })
         
-
+        
 
     }
     finally{
