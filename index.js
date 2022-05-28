@@ -3,7 +3,6 @@ const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000 ;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const query = require('express/lib/middleware/query');
 const { ObjectID } = require('bson');
 
 
@@ -68,9 +67,10 @@ async function run(){
 
         
         app.post('/order',async(req,res)=>{
+            console.log("body",req.body)
             const order = req.body;
-            const query = {price: order.price}
-            const result = await orderCollection.insertOne(query);
+            const query = {user: order.user}
+            const result = await orderCollection.insertOne(order);
             res.send(result);
         })
         app.get('/review',async(req,res)=>{
@@ -100,5 +100,5 @@ app.get('/', (req, res) => {
   })
 
   app.listen(port, () => {
-    console.log(`MoTo Parts server is running  on port ${port}`)
+    console.log(`MoTo Parts server is running  on  ${port}`)
   })
